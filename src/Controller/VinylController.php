@@ -12,7 +12,23 @@ class VinylController extends AbstractController
     #[Route('/', name: 'homepage')]
     public function homepage(): Response
     {
-        return new Response('Title PB & Jams');
+        $tracks = [
+            ['song' => 'Purple Haze', 'artist' => 'Jimi Hendrix'],
+            ['song' => 'The Wind Cries Mary', 'artist' => 'Jimi Hendrix'],
+            ['song' => 'All Along the Watchtower', 'artist' => 'Jimi Hendrix'],
+            ['song' => 'Hey Joe', 'artist' => 'Jimi Hendrix'],
+            ['song' => 'Little Wing', 'artist' => 'Jimi Hendrix'],
+            ['song' => 'Foxy Lady', 'artist' => 'Jimi Hendrix'],
+            ['song' => 'Crosstown Traffic', 'artist' => 'Jimi Hendrix'],
+            ['song' => 'Fire', 'artist' => 'Jimi Hendrix'],
+            ['song' => 'Red House', 'artist' => 'Jimi Hendrix'],
+            ['song' => 'Voodoo Child', 'artist' => 'Jimi Hendrix'],
+        ];
+
+        return $this->render('vinyl/homepage.html.twig', [
+            'title' => 'PB & Jams',
+            'tracks' => $tracks,
+        ]); 
     }
 
     #[Route('/browse/{slug}', name: 'vinyl_genre')]
