@@ -10,9 +10,15 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/categories', name: 'category_')]
 class CategoryController extends AbstractController
 {
+    
     #[Route('/{slug}', name: 'list')]
     public function list(Category $category): Response
     {
-        return $this->render('category/list.html.twig', compact('category'));
+        $product = $category->getProducts();
+
+        return $this->render('category/list.html.twig', [
+            'category' => $category,
+            'products' => $product
+        ]);
     }
 }
