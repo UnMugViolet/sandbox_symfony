@@ -18,6 +18,12 @@ class Category
     #[ORM\Column(length: 100)]
     private ?string $name = null;
 
+    #[ORM\Column(type: 'integer', length: 100)]
+    private $categoryOrder;
+
+    #[ORM\Column(length: 100)]
+    private ?string $slug;
+
     #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'categories')]
     private ?self $parent = null;
 
@@ -58,6 +64,30 @@ class Category
     public function setParent(?self $parent): static
     {
         $this->parent = $parent;
+
+        return $this;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): static
+    {
+        $this->slug = $slug;
+
+        return $this;
+    }
+
+    public function getCategoryOrder(): ?int
+    {
+        return $this->categoryOrder;
+    }
+
+    public function setCategoryOrder(int $categoryOrder): static
+    {
+        $this->categoryOrder = $categoryOrder;
 
         return $this;
     }
