@@ -9,7 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('/produits', name: 'product_')]
 class ProductController extends AbstractController
@@ -20,30 +20,48 @@ class ProductController extends AbstractController
         return $this->render('product/index.html.twig');
     }
 
+    #[Route('/ajout', name: 'add')]
+    public function add(Request $request, EntityManagerInterface $em, SluggerInterface $slugger): Response
+    {
+        // New product
+        $product = new Product();
+        // Create form
+        $productForm = $this->createForm(ProductFormType::class, $product);
+
+        // Handle form
+        $productForm->handleRequest($request);
+
+        // If form is submitted and valid
+        if($productForm->isSubmitted() && $productForm->isValid()){
+            // Set slug
+            $slug = $slugger->slug($product->getName());
+            $product->setSlug($slug);
+
+            // Set date
+            $product->setCreatedAt(new \DateTimeImmutable());
+
+            // Set price in cents
+            $price = $product->getPrice() * 100;
+            $product->setPrice($price);
+
+            // Save product
+            $em->persist($product);
+            $em->flush();
+
+            $this->addFlash('success', 'Le produit a bien été ajouté');
+
+            return $this->redirectToRoute('product_index');
+        }
+
+        return $this->render('product/add.html.twig',[
+                'productForm' => $productForm->createView()
+            ]);
+    }
+
     #[Route('/{slug}', name: 'details')]
     public function details(Product $product): Response
     {
         return $this->render('product/details.html.twig', compact('product'));
     }
 
-    #[Route('ajouter', name: 'add')]
-    public function add(): Response
-    {
-        $product = new Product();
-        $form = $this->createForm(ProductType::class, $product);
-
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $product = $form->getData();
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($product);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('product_details', ['slug' => $product->getSlug()]);
-        }
-
-        return $this->render('product/form.html.twig', [
-            'form' => $form->createView(),
-        ]);
-    }
 }
